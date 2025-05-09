@@ -2,6 +2,5 @@
 [Dd]esktop.ini
 [Tt]humbs.db
 .DS_Store
-AMBuildScript
 build
-configure.py
+safetyhook

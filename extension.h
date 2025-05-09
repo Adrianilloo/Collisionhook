@@ -9,6 +9,7 @@
 class IPhysicsEnvironment;
 class IPhysicsCollisionSolver;
 class IPhysicsObject;
+struct PhysicsCollisionRulesCache_t;
 
 
 class CollisionHook :
@@ -87,7 +88,11 @@ public:
 public: // hooks
 	IPhysicsEnvironment *CreateEnvironment();
 	void SetCollisionSolver( IPhysicsCollisionSolver *pSolver );
-	int VPhysics_ShouldCollide( IPhysicsObject *pObj1, IPhysicsObject *pObj2, void *pGameData1, void *pGameData2 );
+	int VPhysics_ShouldCollide(IPhysicsObject *pObj1, IPhysicsObject *pObj2, void *pGameData1, void *pGameData2
+		#if (SOURCE_ENGINE == SE_LEFT4DEAD2)
+		, const PhysicsCollisionRulesCache_t&, const PhysicsCollisionRulesCache_t&
+		#endif
+	);
 
 };
 

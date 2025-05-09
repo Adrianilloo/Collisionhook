@@ -22,7 +22,13 @@ SMEXT_LINK( &g_CollisionHook );
 
 SH_DECL_HOOK0( IPhysics, CreateEnvironment, SH_NOATTRIB, 0 , IPhysicsEnvironment * );
 SH_DECL_HOOK1_void( IPhysicsEnvironment, SetCollisionSolver, SH_NOATTRIB, 0, IPhysicsCollisionSolver * );
+
+#if (SOURCE_ENGINE == SE_LEFT4DEAD2)
+SH_DECL_HOOK6( IPhysicsCollisionSolver, ShouldCollide, SH_NOATTRIB, 0, int, IPhysicsObject *,
+	IPhysicsObject *, void *, void *, const PhysicsCollisionRulesCache_t&, const PhysicsCollisionRulesCache_t& );
+#else
 SH_DECL_HOOK4( IPhysicsCollisionSolver, ShouldCollide, SH_NOATTRIB, 0, int, IPhysicsObject *, IPhysicsObject *, void *, void * );
+#endif
 
 
 IGameConfig *g_pGameConf = NULL;
@@ -175,7 +181,11 @@ void CollisionHook::SetCollisionSolver( IPhysicsCollisionSolver *pSolver )
 	RETURN_META( MRES_IGNORED );
 }
 
-int CollisionHook::VPhysics_ShouldCollide( IPhysicsObject *pObj1, IPhysicsObject *pObj2, void *pGameData1, void *pGameData2 )
+int CollisionHook::VPhysics_ShouldCollide(IPhysicsObject *pObj1, IPhysicsObject *pObj2, void *pGameData1, void *pGameData2
+#if (SOURCE_ENGINE == SE_LEFT4DEAD2)
+	, const PhysicsCollisionRulesCache_t&, const PhysicsCollisionRulesCache_t&
+#endif
+)
 {
 	if ( g_pCollisionFwd->GetFunctionCount() == 0 )
 		RETURN_META_VALUE( MRES_IGNORED, 1 ); // no plugins are interested, let the game decide

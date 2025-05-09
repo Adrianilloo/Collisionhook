@@ -3,33 +3,21 @@ import os.path
 
 projectName = 'collisionhook'
 
-# Fix various compiler errors under sample_ext's AMBuildScript
-compiler = builder.compiler
-compiler.cxxincludes += [os.path.join(Extension.sm_root, 'public', 'CDetour')]
-
-if compiler.like('gcc'):
-	compiler.defines += ['HAVE_STRING_H']
-
-	if (compiler.vendor == 'clang' and compiler.version >= 'clang-10'):
-		compiler.cxxflags += ['-Wno-expansion-to-defined', '-Wno-implicit-int-float-conversion']
-
-project = Extension.HL2Project(builder, projectName + '.ext')
-project.sources += [
+sourceFiles = [
 	'extension.cpp',
-	os.path.join(Extension.sm_root, 'public', 'smsdk_ext.cpp'),
-	os.path.join(Extension.sm_root, 'public', 'CDetour', 'detours.cpp'),
-	os.path.join(Extension.sm_root, 'public', 'asm', 'asm.c'),
+	os.path.join(Extension.sm_root, 'public', 'smsdk_ext.cpp')
 ]
 
-# SM 1.10+
-libudisFolder = os.path.join(Extension.sm_root, 'public', 'libudis86')
-udisSources = ['decode.c', 'itab.c', 'syn-att.c', 'syn-intel.c', 'syn.c', 'udis86.c']
+for compiler in Extension.compilers:
+	builder.compiler = Extension.configure(compiler)
+	project = builder.project = Extension.HL2Project(builder, projectName + '.ext')
+	project.sources += sourceFiles
 
-for udisSource in udisSources:
-	project.sources += [os.path.join(libudisFolder, udisSource)]
+	for sdk in Extension.sdks:
+		sdk = Extension.sdks[sdk]
 
-for sdk_name in Extension.sdks:
-	sdk = Extension.sdks[sdk_name]
-	binary = Extension.HL2Config(project, projectName + '.ext.' + sdk.ext, sdk)
+		if sdk.specPasses(compiler.target):
+			binary = Extension.HL2Config(builder, projectName + '.ext.' + sdk.ext, sdk)
+			Extension.AddCDetour(binary)
 
-Extension.extensions = builder.Add(project)
+	Extension.extensions += builder.Add(project)

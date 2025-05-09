@@ -3,17 +3,25 @@ import os
 
 builder.SetBuildFolder('package')
 
+smPath = 'addons/sourcemod/'
+
 folder_list = [
-	'addons/sourcemod/extensions',
-	'addons/sourcemod/scripting/include',
-	'addons/sourcemod/gamedata'
+	'gamedata',
+	'scripting/include'
 ]
+
+arch_subdirs = {
+	'x86_64': 'x64'
+}
+
+for cxx_task in Extension.extensions:
+	folder_list += ['extensions/' + arch_subdirs.get(cxx_task.target.arch, '')]
 
 # Create the distribution folder hierarchy
 folder_map = {}
 
 for folder in folder_list:
-	norm_folder = os.path.normpath(folder)
+	norm_folder = os.path.normpath(os.path.join(smPath, folder))
 	folder_map[folder] = builder.AddFolder(norm_folder)
 
 # Performs all straight-up file copies from the source tree
@@ -27,16 +35,16 @@ def CopyFiles(src, dest, files):
 		source_path = os.path.join(builder.sourcePath, src, source_file)
 		builder.AddCopy(source_path, dest_entry)
 
-# Include files 
-CopyFiles('extra', 'addons/sourcemod/scripting/include',
-	[ 'collisionhook.inc', ]
+# Include files
+CopyFiles('extra', 'scripting/include',
+	['collisionhook.inc']
 )
 
 # GameData files
-CopyFiles('extra', 'addons/sourcemod/gamedata',
-	[ 'collisionhook.txt' ]
+CopyFiles('extra', 'gamedata',
+	['collisionhook.txt']
 )
 
 # Copy binaries
 for cxx_task in Extension.extensions:
-	builder.AddCopy(cxx_task.binary, folder_map['addons/sourcemod/extensions'])
+	builder.AddCopy(cxx_task.binary, folder_map['extensions/' + arch_subdirs.get(cxx_task.target.arch, '')])

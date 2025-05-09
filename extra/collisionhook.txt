@@ -17,6 +17,7 @@
 			{
 				"windows"	"\x2A\x2A\x2A\x2A\x2A\x2A\x2A\x75\x2A\xB0\x2A\x5F\xC3\x56"
 				"linux"		"@_Z22PassServerEntityFilterPK13IHandleEntityS1_"
+				"linux64"	"@_Z22PassServerEntityFilterPK13IHandleEntityS1_"
 			}
 		}
 	}
